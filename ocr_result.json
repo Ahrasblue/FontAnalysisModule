@@ -1,0 +1,62 @@
+{
+  "version": "V2",
+  "requestId": "sample-request-id-12345",
+  "timestamp": 0,
+  "images": [
+    {
+      "uid": "sample-image-uid",
+      "name": "sample_image.jpg",
+      "inferResult": "SUCCESS",
+      "fields": [
+        {
+          "boundingPoly": {
+            "vertices": [
+              { "x": 50, "y": 50 },
+              { "x": 150, "y": 50 },
+              { "x": 150, "y": 80 },
+              { "x": 50, "y": 80 }
+            ]
+          },
+          "inferText": "대한민국",
+          "inferConfidence": 0.99
+        },
+        {
+          "boundingPoly": {
+            "vertices": [
+              { "x": 160, "y": 50 },
+              { "x": 240, "y": 51 },
+              { "x": 240, "y": 81 },
+              { "x": 160, "y": 80 }
+            ]
+          },
+          "inferText": "검찰청",
+          "inferConfidence": 0.98
+        },
+        {
+          "boundingPoly": {
+            "vertices": [
+              { "x": 50, "y": 120 },
+              { "x": 150, "y": 120 },
+              { "x": 150, "y": 150 },
+              { "x": 50, "y": 150 }
+            ]
+          },
+          "inferText": "계좌번호",
+          "inferConfidence": 0.97
+        },
+        {
+          "boundingPoly": {
+            "vertices": [
+              { "x": 160, "y": 122 },
+              { "x": 250, "y": 123 },
+              { "x": 250, "y": 155 },
+              { "x": 160, "y": 154 }
+            ]
+          },
+          "inferText": "123-456",
+          "inferConfidence": 0.95
+        }
+      ]
+    }
+  ]
+}
