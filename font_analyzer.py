@@ -25,6 +25,32 @@ def check_spacing_consistency(line):
     if avg_space > 0 and np.std(spaces) / avg_space > 0.5: return 20
     return 0
 
+def check_line_spacing_consistency(lines):
+    if len(lines) < 3:
+        return 0
+
+    # 각 라인의 평균적인 수직 위치 계산
+    line_y_positions = []
+    for line in lines:
+        avg_top = np.mean([word['top'] for word in line])
+        line_y_positions.append(avg_top)
+    
+    # 연속된 라인들 사이의 수직 간격 계산
+    line_spaces = []
+    for i in range(len(line_y_positions) - 1):
+        space = line_y_positions[i+1] - line_y_positions[i]
+        if space > 0:
+            line_spaces.append(space)
+            
+    if not line_spaces:
+        return 0
+    
+    avg_space = np.mean(line_spaces)
+    if avg_space > 0 and np.std(line_spaces) / avg_space > 0.2:
+        return 40 
+        
+    return 0
+
 def analyze_document_font(json_file_path):
     try:
         with open(json_file_path, 'r', encoding='utf-8') as f:
@@ -39,7 +65,7 @@ def analyze_document_font(json_file_path):
     processed_words = []
     for field in fields:
         vertices = field.get("boundingPoly", {}).get("vertices", [])
-        if len(vertices) == 4:
+        if len(vertices) == 4 and field.get('inferText'): # 텍스트가 있는 경우만 처리
             processed_words.append({
                 'text': field.get("inferText", ""),
                 'top': (vertices[0]['y'] + vertices[1]['y']) / 2,
@@ -55,6 +81,7 @@ def analyze_document_font(json_file_path):
         current_line = [processed_words[0]]
         for word in processed_words[1:]:
             base_word = current_line[0]
+            # 같은 라인 판단 기준: 기준 단어 높이의 50% 이내에 있으면 같은 라인으로 간주
             if abs(word['top'] - base_word['top']) < base_word['height'] * 0.5:
                 current_line.append(word)
             else:
@@ -63,11 +90,16 @@ def analyze_document_font(json_file_path):
         lines.append(current_line)
 
     total_score = 0
+    
+    total_score += check_line_spacing_consistency(lines)
+    
+    # 각 라인 내부 일관성 검사
     for line in lines:
         total_score += check_height_consistency(line)
         total_score += check_alignment_consistency(line)
         total_score += check_spacing_consistency(line)
     
+    # 최종 판정
     decision = "Safe"
     if total_score > 50:
         decision = "Danger"
@@ -80,7 +112,7 @@ def analyze_document_font(json_file_path):
     }
 
 if __name__ == "__main__":
-    result_file = "ocr_result.json"
+    result_file = "ocr_result.json" 
     analysis_result = analyze_document_font(result_file)
     print("--- 최종 모듈 테스트 결과 ---")
     print(analysis_result)
